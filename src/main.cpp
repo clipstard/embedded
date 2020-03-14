@@ -35,6 +35,7 @@
 #include <signal/controllers/motorcontroller.hpp>
 /* Quadrature encoder functionality */
 #include <hardware/encoders/quadratureencoder.hpp>
+#include <examples/sensors/sensorpublisher.hpp>
 
 
 /// Serial interface with the another device(like single board computer). It's an built-in class of mbed based on the UART comunication, the inputs have to be transmiter and receiver pins. 
@@ -62,7 +63,8 @@ signal::filter::lti::siso::CIIRFilter<float,1,2> g_encoderFilter(utils::linalg::
 hardware::encoders::CQuadratureEncoderWithFilter g_quadratureEncoderTask(g_period_Encoder,hardware::drivers::CQuadratureCounter_TIM4::Instance(),2048,g_encoderFilter);
 
 ///Create an encoder publisher object to transmite the rotary speed of the dc motor. 
-examples::sensors::CEncoderPublisher   g_encoderPublisher(0.01/g_baseTick,g_quadratureEncoderTask,g_rpi);
+examples::sensors::CEncoderPublisher    g_encoderPublisher(0.01/g_baseTick,g_quadratureEncoderTask,g_rpi);
+examples::sensors::SensorPublisher      g_sensorPublisher(0.01/g_baseTick, g_rpi);
 
 //Create an object to convert volt to pwm for motor driver
 /// Create a splines based converter object to convert the volt signal to pwm signal
@@ -80,6 +82,8 @@ utils::serial::CSerialMonitor::CSerialSubscriberMap g_serialMonitorSubscribers =
     {"BRAK",mbed::callback(&g_robotstatemachine,&brain::CRobotStateMachine::serialCallbackBrake)},
     {"PIDA",mbed::callback(&g_robotstatemachine,&brain::CRobotStateMachine::serialCallbackPID)},
     {"ENPB",mbed::callback(&g_encoderPublisher,&examples::sensors::CEncoderPublisher::serialCallback)},
+    {"USEN",mbed::callback(&g_sensorPublisher,&examples::sensors::SensorPublisher::serialCallback)},
+
 };
 
 /// Create the serial monitor object, which decodes, redirects the messages and transmites the responses.
@@ -90,7 +94,8 @@ utils::serial::CSerialMonitor g_serialMonitor(g_rpi, g_serialMonitorSubscribers)
 utils::task::CTask* g_taskList[] = {
     &g_blinker,
     &g_serialMonitor,
-    &g_encoderPublisher
+    &g_encoderPublisher,
+    &g_sensorPublisher
 }; 
 //! [Adding a resource]
 

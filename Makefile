@@ -39,7 +39,7 @@ VPATH = $(SRCDIR)/
 ###############################################################################
 # Project settings
 
-PROJECT := Nucleo_mbedrobot
+PROJECT := Nucleo
 
 # Project settings
 ###############################################################################
@@ -52,6 +52,7 @@ OBJECTS += src/utils/serial/serialmonitor.o
 OBJECTS += src/examples/echoer.o
 OBJECTS += src/examples/blinker.o
 OBJECTS += src/examples/sensors/encoderpublisher.o
+OBJECTS += src/examples/sensors/sensorpublisher.o
 
 OBJECTS += src/hardware/drivers/steeringmotor.o
 OBJECTS += src/hardware/drivers/dcmotor.o
