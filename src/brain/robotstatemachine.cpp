@@ -119,7 +119,7 @@ namespace brain{
             // Move state - control the dc motor rotation speed and the steering angle. 
             case 1:
                 m_steeringControl.setAngle(m_angle); // control the steering angle
-                m_cSteeringControl.setAngle(m_cangle); 
+                m_cSteeringControl.setAngle(-m_cangle);
                 if(m_ispidActivated && m_control!=NULL) // Check the pid controller 
                 {
                     m_control->setRef(CRobotStateMachine::Mps2Rps( m_speed )); // Set the reference of dc motor speed

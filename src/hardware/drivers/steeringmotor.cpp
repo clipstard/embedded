@@ -25,14 +25,13 @@ limitations under the License.
 
 #include <hardware/drivers/steeringmotor.hpp>
 
-
 namespace hardware::drivers{
     /** @brief  It initializes the pwm parameters and set the steering in zero position. Initially it sets the limits of input degree values to -23 and +23 degree. 
      *
      *  @param f_pwm               pin connected to servo motor
      */
     CSteeringMotor::CSteeringMotor(PinName f_pwm)
-        :CSteeringMotor(f_pwm,-23.0,23.0)
+        :CSteeringMotor(f_pwm, INF_LIMIT, SUP_LIMIT)
         
     {
     };

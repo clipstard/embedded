@@ -26,6 +26,8 @@ limitations under the License.
 /* Include guard */
 #ifndef STEERINGMOTOR_HPP
 #define STEERINGMOTOR_HPP
+#define SUP_LIMIT 26.0
+#define INF_LIMIT -26.0
 
 #include <mbed.h>
 
