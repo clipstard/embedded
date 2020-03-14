@@ -56,6 +56,7 @@ namespace brain{
             Serial& f_serialPort, 
             hardware::drivers::IMotorCommand&                 f_motorControl,
             hardware::drivers::ISteeringCommand&              f_steeringControl,
+            hardware::drivers::ISteeringCommand&              f_cSteeringControl,
             signal::controllers::CMotorController*           f_control = NULL);
         
 
@@ -98,10 +99,14 @@ namespace brain{
         hardware::drivers::IMotorCommand&                 m_motorControl;
         /* Steering wheel control interface */
         hardware::drivers::ISteeringCommand&              m_steeringControl;
+        /* Steering Camera control interface */
+        hardware::drivers::ISteeringCommand&              m_cSteeringControl;
         /* Speed */
         float m_speed;
         /* Angle */
         float m_angle;
+        /* Camera Angle */
+        float m_cangle;
         /* PEriod i nseconds */
         float   m_period_sec;
         /* State machine state */

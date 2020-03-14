@@ -40,12 +40,15 @@ namespace brain{
             Serial& f_serialPort,
             hardware::drivers::IMotorCommand&                 f_motorControl,
             hardware::drivers::ISteeringCommand&              f_steeringControl,
+            hardware::drivers::ISteeringCommand&              f_cSteeringControl,
             signal::controllers::CMotorController*           f_control) 
         : m_serialPort(f_serialPort)
         , m_motorControl(f_motorControl)
         , m_steeringControl(f_steeringControl)
+        , m_cSteeringControl(f_cSteeringControl)
         , m_speed()
         , m_angle()
+        , m_cangle()
         , m_period_sec(f_period_sec)
         , m_ispidActivated(false)
         , m_hbTimeOut()
@@ -115,7 +118,8 @@ namespace brain{
         {
             // Move state - control the dc motor rotation speed and the steering angle. 
             case 1:
-                m_steeringControl.setAngle(m_angle); // control the steering angle 
+                m_steeringControl.setAngle(m_angle); // control the steering angle
+                m_cSteeringControl.setAngle(m_cangle); 
                 if(m_ispidActivated && m_control!=NULL) // Check the pid controller 
                 {
                     m_control->setRef(CRobotStateMachine::Mps2Rps( m_speed )); // Set the reference of dc motor speed
@@ -154,6 +158,7 @@ namespace brain{
             // Brake state
             case 2:
                 m_steeringControl.setAngle(m_angle); // Setting the steering angle
+                m_cSteeringControl.setAngle(m_cangle);
                 m_motorControl.brake(); // dc motor dynamic braking. 
                 if( m_control!=NULL){ 
                     m_control->clear();
@@ -177,20 +182,31 @@ namespace brain{
     {
         float l_speed;
         float l_angle;
+        float t_speed, t_angle, t_cangle;
         uint32_t l_res = sscanf(a,"%f;%f",&l_speed,&l_angle);
+        uint32_t t_res = sscanf(a, "%f;%f;%f",&t_speed, &t_angle, &t_cangle);
+
         if (2 == l_res)
         {
             if( !m_ispidActivated && !m_motorControl.inRange(l_speed)){ // Check the received control value
                 sprintf(b,"The speed command is too high;;");
                 return;
             }
+
             if( m_ispidActivated && !m_control->inRange(CRobotStateMachine::Mps2Rps(l_speed))){ //Check the received reference value
                 sprintf(b,"The speed reference is too high;;");
                 return;
             }
+
             if( !m_steeringControl.inRange(l_angle)){ // Check the received steering angle
                 sprintf(b,"The steering angle command is too high;;");
                 return;
+            }
+
+            if (3 == t_res) {
+                m_cangle = t_cangle;
+            } else {
+                m_cangle = 0.0;
             }
 
             m_speed = l_speed;
@@ -224,6 +240,7 @@ namespace brain{
             }
             m_speed = 0;
             m_angle = l_angle;
+            m_cangle = 0.0;
             // Brake state 
             m_state = 2;
 
@@ -259,6 +276,7 @@ namespace brain{
             }
             m_speed=0;
             m_angle = l_angle; 
+            m_cangle = 0.0;
             m_motorControl.inverseDirection(l_brake);
             m_hbTimeOut.attach(callback(this,&CRobotStateMachine::BrakeCallback),0.04); // Attaching a callback function for changing state to brake. 
             m_state = 0;
